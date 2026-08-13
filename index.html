@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Incidencias LM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="brand-corner">
+      <img src="logopandetata.png" alt="Pan de Tata" class="brand-corner__logo" />
+    </div>
+
+    <header class="topbar">
+      <p class="eyebrow">LM</p>
+      <h1>Registro de Incidencias</h1>
+      <p class="topbar__subtitle">Selecciona un modulo para registrar la incidencia en su tabla correspondiente.</p>
+    </header>
+
+    <main class="main">
+      <div id="env-warning" class="alert alert--warn hidden">
+        Configura la URL del Apps Script en <strong>config.js</strong> para habilitar los envios a Google Sheets.
+      </div>
+
+      <section class="card" aria-label="Modulos de incidencias">
+        <h2 class="section-title">Tipo de incidencia</h2>
+        <div class="module-buttons">
+          <button class="module-btn" data-module="servicio" type="button">
+            <span class="module-btn__area">Barra</span>
+            <span>Error en Servicio</span>
+          </button>
+          <button class="module-btn" data-module="consumo" type="button">
+            <span class="module-btn__area">Cocina</span>
+            <span>Consumo Interno</span>
+          </button>
+          <button class="module-btn" data-module="manipulacion" type="button">
+            <span class="module-btn__area">Cocina</span>
+            <span>Mala Manipulacion</span>
+          </button>
+          <button class="module-btn" data-module="desperdicio" type="button">
+            <span class="module-btn__area">Vegetales</span>
+            <span>Desperdicio Perecedero</span>
+          </button>
+          <button class="module-btn" data-module="merma_pan" type="button">
+            <span class="module-btn__area">Cocina</span>
+            <span>Merma de Pan</span>
+          </button>
+        </div>
+
+        <section id="entry-panel" class="entry-panel hidden">
+          <div class="entry-header">
+            <div>
+              <p class="eyebrow">Registro seleccionado</p>
+              <h2 id="module-title">Incidencia</h2>
+            </div>
+            <button id="change-module" class="link-btn" type="button">Cambiar modulo</button>
+          </div>
+
+          <p id="module-description" class="module-description"></p>
+
+          <form id="incident-form" class="incident-form" novalidate>
+            <div class="form-grid">
+              <label>
+                <span>Fecha *</span>
+                <input id="fecha" name="fecha" type="date" required />
+              </label>
+
+              <label>
+                <span>Responsable *</span>
+                <select id="responsable" name="responsable" required>
+                  <option value="">Seleccione un responsable...</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Turno *</span>
+                <select id="turno" name="turno" required>
+                  <option value="">Seleccione un turno...</option>
+                </select>
+              </label>
+
+              <label class="product-field">
+                <span>Producto *</span>
+                <input id="producto" name="producto" type="text" list="product-list" placeholder="Busca el producto" autocomplete="off" required />
+                <datalist id="product-list"></datalist>
+              </label>
+            </div>
+
+            <div id="extra-fields" class="extra-fields hidden" aria-live="polite"></div>
+
+            <div class="form-actions">
+              <button id="submit-btn" class="btn btn--primary" type="submit">Guardar Registro</button>
+            </div>
+          </form>
+        </section>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <div id="standby-overlay" class="standby-overlay hidden" aria-live="assertive" aria-busy="true" role="status">
+      <div class="standby-panel">
+        <div class="standby-spinner" aria-hidden="true"></div>
+        <p>Guardando incidencia...</p>
+        <small>No cierres esta pagina hasta que finalice el envio.</small>
+      </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
