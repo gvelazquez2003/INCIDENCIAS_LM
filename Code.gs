@@ -22,9 +22,6 @@ const CONFIG = {
   visualizationSheets: {
     registros: 'VISUALIZACION REGISTROS',
   },
-  obsoleteSheets: {
-    resumen: 'RESUMEN REGISTROS',
-  },
   priceSheetName: 'PRECIOS PRODUCTOS',
 };
 
@@ -790,7 +787,7 @@ function refreshVisualization_() {
   rewriteSheet_(registrosSheet, registrosHeaders, registros);
   if (registros.length) {
   }
-  const resumenDeleted = deleteSheetIfExists_(CONFIG.obsoleteSheets.resumen);
+  const resumenDeleted = deleteSheetIfExists_('RESUMEN REGISTROS');
 
   return {
     registrosSheet: CONFIG.visualizationSheets.registros,
