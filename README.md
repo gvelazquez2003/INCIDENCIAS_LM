@@ -89,13 +89,13 @@ Luego de desplegar Apps Script, abre la URL del Web App con esta accion para cre
 las pestanas y encabezados:
 
 ```text
-https://script.google.com/macros/s/.../exec?action=setupSheets
+https://script.google.com/macros/s/AKfycbyT0rcYJRCamojgQdraHXYRXUpzhYYDaTSu0IDegp1vQYqJhjX7B9RlbJBLbEUq16bV/exec?action=setupSheets
 ```
 
 Tambien puedes refrescar la visualizacion manualmente con:
 
 ```text
-https://script.google.com/macros/s/.../exec?action=refreshVisualization
+https://script.google.com/macros/s/AKfycbyT0rcYJRCamojgQdraHXYRXUpzhYYDaTSu0IDegp1vQYqJhjX7B9RlbJBLbEUq16bV/exec?action=refreshVisualization
 ```
 
 Cada nuevo registro intenta actualizar automaticamente estas pestanas.
@@ -110,10 +110,11 @@ Cada nuevo registro intenta actualizar automaticamente estas pestanas.
 4. Copia la URL terminada en `/exec` y pegala en `config.js`:
 
 ```js
-window.APPS_SCRIPT_URL = 'https://script.google.com/macros/s/.../exec';
+window.APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyT0rcYJRCamojgQdraHXYRXUpzhYYDaTSu0IDegp1vQYqJhjX7B9RlbJBLbEUq16bV/exec';
 ```
 
 5. Publica este frontend en Vercel para habilitar el proxy `/api/apps-script`.
+   Deploy actual: `https://incidencias-lm.vercel.app/`.
 
 El endpoint `GET ?action=getCatalogs` retorna los responsables, turnos y
 productos leidos desde `PRECIOS PRODUCTOS`. El `POST` con la accion
