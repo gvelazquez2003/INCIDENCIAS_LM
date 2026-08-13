@@ -1,4 +1,6 @@
-const SCRIPT_VERSION = '2026-08-13-lm-sheet-products';
+const SCRIPT_VERSION = '2026-08-13-lm-no-summary-sheet';
+const VISUALIZATION_REGISTROS_SHEET = 'VISUALIZACION REGISTROS';
+const OBSOLETE_RESUMEN_REGISTROS_SHEET = 'RESUMEN REGISTROS';
 
 const CONFIG = {
   // Replace this value with the ID from the Google Sheets URL before deploying.
@@ -18,9 +20,6 @@ const CONFIG = {
     manipulacion: 'MALA MANIPULACION (COCINA)',
     desperdicio: 'DESPERDICIO PERECEDERO (VEG)',
     merma_pan: 'MERMA DE PAN (COCINA)',
-  },
-  visualizationSheets: {
-    registros: 'VISUALIZACION REGISTROS',
   },
   priceSheetName: 'PRECIOS PRODUCTOS',
 };
@@ -769,7 +768,7 @@ function setupSheets_() {
 
 function refreshVisualization_() {
   const registros = collectVisualizationRows_();
-  const registrosSheet = getSheet_(CONFIG.visualizationSheets.registros);
+  const registrosSheet = getSheet_(VISUALIZATION_REGISTROS_SHEET);
   const registrosHeaders = [
     'FECHA',
     'MODULO',
@@ -787,10 +786,10 @@ function refreshVisualization_() {
   rewriteSheet_(registrosSheet, registrosHeaders, registros);
   if (registros.length) {
   }
-  deleteSheetIfExists_('RESUMEN REGISTROS');
+  deleteSheetIfExists_(OBSOLETE_RESUMEN_REGISTROS_SHEET);
 
   return {
-    registrosSheet: CONFIG.visualizationSheets.registros,
+    registrosSheet: VISUALIZATION_REGISTROS_SHEET,
     totalRegistros: registros.length,
     totalCostoPerdido: sumCost_(registros),
   };
