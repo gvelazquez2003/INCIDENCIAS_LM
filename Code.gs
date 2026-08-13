@@ -787,11 +787,10 @@ function refreshVisualization_() {
   rewriteSheet_(registrosSheet, registrosHeaders, registros);
   if (registros.length) {
   }
-  const resumenDeleted = deleteSheetIfExists_('RESUMEN REGISTROS');
+  deleteSheetIfExists_('RESUMEN REGISTROS');
 
   return {
     registrosSheet: CONFIG.visualizationSheets.registros,
-    resumenDeleted: resumenDeleted,
     totalRegistros: registros.length,
     totalCostoPerdido: sumCost_(registros),
   };
