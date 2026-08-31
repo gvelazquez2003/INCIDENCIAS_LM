@@ -195,7 +195,7 @@ const CATALOGS = {
   responsablesBarra: [
     'KEIDER MORA',
     'LEANDRO SEPRUM',
-    'ANGELES VELASQUEZ',
+    'ANGEL VELASQUEZ',
     'KAROL MIJARES',
     'ROSMERY FERNANDEZ',
     'ROSANGELES SANCHEZ',
