@@ -1,4 +1,4 @@
-const SCRIPT_VERSION = '2026-08-31-lm-angel-velasquez';
+const SCRIPT_VERSION = '2026-09-01-lm-area-cafe';
 const VISUALIZATION_REGISTROS_SHEET = 'VISUALIZACION REGISTROS';
 const OBSOLETE_RESUMEN_REGISTROS_SHEET = 'RESUMEN REGISTROS';
 
@@ -13,6 +13,7 @@ const CONFIG = {
     manipulacion: ['FECHA', 'PRODUCTO', 'CANTIDAD', 'RESPONSABLE', 'TURNO', 'LISTA DE INCIDENCIAS', 'OBSERVACIONES', 'PRECIO UNITARIO', 'COSTO PERDIDA'],
     desperdicio: ['FECHA', 'PRODUCTO', 'CANTIDAD', 'RESPONSABLE', 'TURNO', 'OBSERVACIONES', 'PRECIO POR KG', 'COSTO PERDIDA'],
     merma_pan: ['FECHA', 'PRODUCTO', 'RESPONSABLE', 'TURNO', 'CANTIDAD', 'FECHA DE VENCIMIENTO DEL PAQUETE', 'PRECIO UNITARIO', 'COSTO PERDIDA'],
+    area_cafe: ['FECHA', 'PRODUCTO', 'PRODUCTO SELECCIONADO', 'TOSTADO', 'MERMA DEL TUESTE', 'RESPONSABLE', 'TURNO'],
   },
   sheetNames: {
     servicio: 'ERROR EN SERVICIO (BARRA)',
@@ -20,14 +21,19 @@ const CONFIG = {
     manipulacion: 'MALA MANIPULACION (COCINA)',
     desperdicio: 'DESPERDICIO PERECEDERO (VEG)',
     merma_pan: 'MERMA DE PAN (COCINA)',
+    area_cafe: 'AREA CAFE',
   },
   priceSheetName: 'PRECIOS PRODUCTOS',
+  coffeeProductsSheetName: 'PRODUCTOS AREA CAFE',
 };
 
 const HEADER_ALIASES = {
   FECHA: ['FECHA'],
   PRODUCTO: ['PRODUCTO'],
   CANTIDAD: ['CANTIDAD'],
+  PRODUCTO_SELECCIONADO: ['PRODUCTO SELECCIONADO', 'PRODUCTO SELECCIONADO (KG)'],
+  TOSTADO: ['TOSTADO', 'TOSTADO (KG)'],
+  MERMA_TUESTE: ['MERMA DEL TUESTE', 'MERMA DEL TUESTE (KG)'],
   RESPONSABLE: ['RESPONSABLE'],
   TURNO: ['TURNO'],
   LISTA_INCIDENCIAS: ['LISTA DE INCIDENCIAS', 'INCIDENCIA', 'INCIDENCIAS'],
@@ -191,6 +197,44 @@ const CATALOGS = {
         },
       ],
     },
+    {
+      id: 'area_cafe',
+      label: 'AREA CAFE',
+      description: 'Control del grano verde seleccionado, el cafe tostado y la merma del tueste.',
+      responsablesCatalog: 'responsablesCafe',
+      productCatalog: 'productosCafe',
+      usesPrice: false,
+      extraFields: [
+        {
+          name: 'productoSeleccionado',
+          label: 'Producto seleccionado (KG) *',
+          type: 'number',
+          placeholder: '10.00',
+          defaultValue: '10',
+          min: '0.01',
+          step: '0.01',
+          required: true,
+        },
+        {
+          name: 'tostado',
+          label: 'Tostado (KG) *',
+          type: 'number',
+          placeholder: '0.00',
+          min: '0.01',
+          step: '0.01',
+          required: true,
+        },
+        {
+          name: 'mermaTueste',
+          label: 'Merma del tueste (KG) *',
+          type: 'number',
+          placeholder: '0.00',
+          min: '0.01',
+          step: '0.01',
+          required: true,
+        },
+      ],
+    },
   ],
   responsablesBarra: [
     'KEIDER MORA',
@@ -206,6 +250,11 @@ const CATALOGS = {
     'VIVIANA FARIÑA',
     'JHEISSON INNAMURATI',
   ],
+  responsablesCafe: [
+    'IMANUEL GONZALEZ',
+    'KENJI RIVAS',
+    'PEDRO ESCALONA',
+  ],
   responsables: [
     'KATHERINE GUILLEN',
     'DAVID ESCALONA',
@@ -219,6 +268,11 @@ const CATALOGS = {
     'ROSANGELES SANCHEZ',
   ],
   turnos: ['DIURNO', 'NOCTURNO'],
+  productosCafe: [
+    'GRANO VERDE MERIDA',
+    'GRANO VERDE TACHIRA',
+    'GRANO VERDE TRUJILLO',
+  ],
   incidenciasServicio: [
     'Comanda repetida, sin aviso',
     'Producto equivocado, segun peticion del cliente',
@@ -434,6 +488,8 @@ function getCatalogs_() {
     catalogs.productos = priceProducts;
     catalogs.productosManipulacion = mergeCatalogValues_(priceProducts, MANIPULACION_EXTRA_PRODUCTS);
   }
+  const coffeeProducts = getCoffeeProductNames_();
+  if (coffeeProducts.length) catalogs.productosCafe = coffeeProducts;
   return catalogs;
 }
 
@@ -444,6 +500,14 @@ function cloneCatalogs_() {
 function getPriceProductNames_() {
   const rows = getPriceCatalogRows_();
   return uniqueCatalogValues_(rows.map(function (row) { return row.producto; }));
+}
+
+function getCoffeeProductNames_() {
+  setupCoffeeProductsSheet_();
+  const sheet = getSheet_(CONFIG.coffeeProductsSheetName);
+  if (sheet.getLastRow() < 2) return CATALOGS.productosCafe.slice();
+  const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues();
+  return uniqueCatalogValues_(values.map(function (row) { return row[0]; }));
 }
 
 function uniqueCatalogValues_(values) {
@@ -521,7 +585,7 @@ function guardarIncidencia_(payload) {
   const turno = requireCatalogValue_(data.turno, catalogs.turnos, 'turno');
   const fecha = parseDate_(data.fecha, 'fecha');
   const sheet = getSheet_(module.sheetName);
-  const price = findProductPrice_(producto);
+  const price = module.usesPrice === false ? '' : findProductPrice_(producto);
   const row = buildRow_(module, data, fecha, producto, responsable, turno, price, catalogs);
   const headers = CONFIG.headers[module.id] || CONFIG.headers.default;
 
@@ -529,8 +593,11 @@ function guardarIncidencia_(payload) {
   const targetRow = sheet.getLastRow() + 1;
   sheet.getRange(targetRow, 1, 1, row.length).setValues([row]);
   try {
+    if (module.id === 'area_cafe') {
+      sheet.getRange(targetRow, 3, 1, 3).setNumberFormat('0.00 "KG"');
+    }
   } catch (error) {
-    Logger.log('No se pudo aplicar formato de fecha: ' + error);
+    Logger.log('No se pudo aplicar formato al registro: ' + error);
   }
 
   try {
@@ -548,6 +615,14 @@ function guardarIncidencia_(payload) {
 
 function buildRow_(module, data, fecha, producto, responsable, turno, price, catalogs) {
   const sourceCatalogs = catalogs || CATALOGS;
+  if (module.id === 'area_cafe') {
+    validateRequired_(data, ['productoSeleccionado', 'tostado', 'mermaTueste']);
+    const productoSeleccionado = parsePositiveNumber_(data.productoSeleccionado, 'productoSeleccionado');
+    const tostado = parsePositiveNumber_(data.tostado, 'tostado');
+    const mermaTueste = parsePositiveNumber_(data.mermaTueste, 'mermaTueste');
+    return [fecha, producto, productoSeleccionado, tostado, mermaTueste, responsable, turno];
+  }
+
   if (module.id === 'servicio' || module.id === 'manipulacion') {
     validateRequired_(data, ['cantidad', 'listaIncidencias']);
     const cantidad = parsePositiveNumber_(data.cantidad, 'cantidad');
@@ -761,11 +836,13 @@ function setupSheets_() {
   });
 
   const prices = setupPriceSheet_();
+  const coffeeProducts = setupCoffeeProductsSheet_();
   updateAllPriceColumns_();
   const visualization = refreshVisualization_();
   return {
     modules: modules,
     prices: prices,
+    coffeeProducts: coffeeProducts,
     visualization: visualization,
   };
 }
@@ -785,10 +862,14 @@ function refreshVisualization_() {
     'FECHA VENCIMIENTO',
     'PRECIO UNITARIO',
     'COSTO PERDIDA',
+    'PRODUCTO SELECCIONADO (KG)',
+    'TOSTADO (KG)',
+    'MERMA DEL TUESTE (KG)',
   ];
 
   rewriteSheet_(registrosSheet, registrosHeaders, registros);
   if (registros.length) {
+    registrosSheet.getRange(2, 12, registros.length, 3).setNumberFormat('0.00 "KG"');
   }
   deleteSheetIfExists_(OBSOLETE_RESUMEN_REGISTROS_SHEET);
 
@@ -826,23 +907,27 @@ function collectVisualizationRows_() {
 }
 
 function normalizeVisualizationRow_(module, row) {
+  if (module.id === 'area_cafe') {
+    return [row[0], module.label, row[1], row[5], row[6], '', '', '', '', '', '', row[2], row[3], row[4]];
+  }
+
   if (module.id === 'servicio' || module.id === 'manipulacion') {
-    return [row[0], module.label, row[1], row[3], row[4], row[5], row[6], row[2], '', row[7], row[8]];
+    return [row[0], module.label, row[1], row[3], row[4], row[5], row[6], row[2], '', row[7], row[8], '', '', ''];
   }
 
   if (module.id === 'merma_pan') {
-    return [row[0], module.label, row[1], row[2], row[3], '', '', row[4], row[5], row[6], row[7]];
+    return [row[0], module.label, row[1], row[2], row[3], '', '', row[4], row[5], row[6], row[7], '', '', ''];
   }
 
   if (module.id === 'consumo') {
-    return [row[0], module.label, row[1], row[3], row[4], '', row[5], row[2], '', row[6], row[7]];
+    return [row[0], module.label, row[1], row[3], row[4], '', row[5], row[2], '', row[6], row[7], '', '', ''];
   }
 
   if (module.id === 'desperdicio') {
-    return [row[0], module.label, row[1], row[3], row[4], '', row[5], row[2], '', row[6], row[7]];
+    return [row[0], module.label, row[1], row[3], row[4], '', row[5], row[2], '', row[6], row[7], '', '', ''];
   }
 
-  return [row[0], module.label, row[1], row[2], row[3], '', '', '', '', row[4], row[5]];
+  return [row[0], module.label, row[1], row[2], row[3], '', '', '', '', row[4], row[5], '', '', ''];
 }
 
 function rewriteSheet_(sheet, headers, rows) {
@@ -893,6 +978,21 @@ function setupPriceSheet_() {
   }
   formatHeader_(sheet, headers.length);
   return CONFIG.priceSheetName;
+}
+
+function setupCoffeeProductsSheet_() {
+  const sheet = getSheet_(CONFIG.coffeeProductsSheetName);
+  const headers = ['PRODUCTO', 'PRESENTACION KG'];
+  ensureHeaders_(sheet, headers);
+  if (sheet.getLastRow() < 2) {
+    const rows = CATALOGS.productosCafe.map(function (producto) {
+      return [producto, 10];
+    });
+    sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
+  }
+  sheet.getRange(2, 2, Math.max(sheet.getLastRow() - 1, 1), 1).setNumberFormat('0.00 "KG"');
+  formatHeader_(sheet, headers.length);
+  return CONFIG.coffeeProductsSheetName;
 }
 
 function updateAllPriceColumns_() {

@@ -157,6 +157,44 @@ const FALLBACK_CATALOGS = {
         },
       ],
     },
+    {
+      id: 'area_cafe',
+      label: 'AREA CAFE',
+      description: 'Control del grano verde seleccionado, el cafe tostado y la merma del tueste.',
+      responsablesCatalog: 'responsablesCafe',
+      productCatalog: 'productosCafe',
+      usesPrice: false,
+      extraFields: [
+        {
+          name: 'productoSeleccionado',
+          label: 'Producto seleccionado (KG) *',
+          type: 'number',
+          placeholder: '10.00',
+          defaultValue: '10',
+          min: '0.01',
+          step: '0.01',
+          required: true,
+        },
+        {
+          name: 'tostado',
+          label: 'Tostado (KG) *',
+          type: 'number',
+          placeholder: '0.00',
+          min: '0.01',
+          step: '0.01',
+          required: true,
+        },
+        {
+          name: 'mermaTueste',
+          label: 'Merma del tueste (KG) *',
+          type: 'number',
+          placeholder: '0.00',
+          min: '0.01',
+          step: '0.01',
+          required: true,
+        },
+      ],
+    },
   ],
   responsablesBarra: [
     'KEIDER MORA',
@@ -172,6 +210,11 @@ const FALLBACK_CATALOGS = {
     'VIVIANA FARIÑA',
     'JHEISSON INNAMURATI',
   ],
+  responsablesCafe: [
+    'IMANUEL GONZALEZ',
+    'KENJI RIVAS',
+    'PEDRO ESCALONA',
+  ],
   responsables: [
     'KATHERINE GUILLEN',
     'DAVID ESCALONA',
@@ -185,6 +228,11 @@ const FALLBACK_CATALOGS = {
     'ROSANGELES SANCHEZ',
   ],
   turnos: ['DIURNO', 'NOCTURNO'],
+  productosCafe: [
+    'GRANO VERDE MERIDA',
+    'GRANO VERDE TACHIRA',
+    'GRANO VERDE TRUJILLO',
+  ],
   incidenciasServicio: ['Comanda repetida, sin aviso', 'Producto equivocado, segun peticion del cliente', 'Pedido mal entregado, equivocacion de mesas o clientes', 'Cambios mal anotados', 'Se cayo al suelo', 'Cliente no satisfecho'],
   incidenciasManipulacion: ['Pasada de coccion', 'Error en cambios', 'Producto demas / duplicado', 'Mala Manipulacion del pan', 'Se cayo al suelo', 'Proteina cruda', 'Cliente no satisfecho', 'Producto frio o mal emplatado'],
   productosMermaPan: [
@@ -354,6 +402,7 @@ function setupModuleSelection() {
     elements.moduleButtons.forEach((button) => button.classList.remove('active'));
     elements.entryPanel.classList.add('hidden');
     elements.form.reset();
+    elements.form.classList.remove('incident-form--cafe');
     elements.extraFields.innerHTML = '';
     elements.extraFields.classList.add('hidden');
     setToday();
@@ -373,6 +422,7 @@ function openModule(moduleId) {
   elements.moduleDescription.textContent = module.description;
   elements.entryPanel.classList.remove('hidden');
   elements.form.reset();
+  elements.form.classList.toggle('incident-form--cafe', module.id === 'area_cafe');
   setToday();
   renderResponsibleOptions(module);
   renderProductOptions(module);
@@ -390,22 +440,24 @@ function renderExtraField(field) {
   const required = field.required ? ' required' : '';
   const label = `${escapeHtml(field.label || field.name)}${field.required && !String(field.label || '').includes('*') ? ' *' : ''}`;
   const placeholder = field.placeholder ? ` placeholder="${escapeHtml(field.placeholder)}"` : '';
+  const fieldClass = `extra-field extra-field--${escapeHtml(field.name)}`;
 
   if (field.type === 'select') {
     const values = Array.isArray(state.catalogs[field.optionsKey]) ? state.catalogs[field.optionsKey] : [];
     const options = [`<option value="">${escapeHtml(field.placeholder || 'Seleccione una opcion...')}</option>`]
       .concat(values.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`))
       .join('');
-    return `<label><span>${label}</span><select name="${escapeHtml(field.name)}"${required}>${options}</select></label>`;
+    return `<label class="${fieldClass}"><span>${label}</span><select name="${escapeHtml(field.name)}"${required}>${options}</select></label>`;
   }
 
   if (field.type === 'textarea') {
-    return `<label class="extra-fields__wide"><span>${label}</span><textarea name="${escapeHtml(field.name)}" rows="3"${placeholder}${required}></textarea></label>`;
+    return `<label class="${fieldClass} extra-fields__wide"><span>${label}</span><textarea name="${escapeHtml(field.name)}" rows="3"${placeholder}${required}></textarea></label>`;
   }
 
   const min = field.min ? ` min="${escapeHtml(field.min)}"` : '';
   const step = field.step ? ` step="${escapeHtml(field.step)}"` : '';
-  return `<label><span>${label}</span><input name="${escapeHtml(field.name)}" type="${escapeHtml(field.type || 'text')}"${placeholder}${min}${step}${required} /></label>`;
+  const defaultValue = field.defaultValue === undefined ? '' : ` value="${escapeHtml(field.defaultValue)}"`;
+  return `<label class="${fieldClass}"><span>${label}</span><input name="${escapeHtml(field.name)}" type="${escapeHtml(field.type || 'text')}"${placeholder}${defaultValue}${min}${step}${required} /></label>`;
 }
 
 function renderCatalogs() {
@@ -514,13 +566,16 @@ function validateExtraFields(payload, module) {
     }
   }
 
-  if (payload.cantidad) {
-    const quantity = Number(payload.cantidad);
-    const quantityMustBeInteger = module.id === 'merma_pan';
-    if (!Number.isFinite(quantity) || quantity <= 0 || (quantityMustBeInteger && !Number.isInteger(quantity))) {
-      showToast(quantityMustBeInteger ? 'La cantidad debe ser un numero entero mayor a cero.' : 'La cantidad debe ser un numero mayor a cero.', 'error');
-      return false;
-    }
+  const invalidNumberField = fields.find((field) => {
+    if (field.type !== 'number' || !payload[field.name]) return false;
+    const value = Number(String(payload[field.name]).replace(',', '.'));
+    const minimum = field.min === undefined ? null : Number(field.min);
+    const mustBeInteger = String(field.step || '') === '1';
+    return !Number.isFinite(value) || (minimum !== null && value < minimum) || (mustBeInteger && !Number.isInteger(value));
+  });
+  if (invalidNumberField) {
+    showToast(`${invalidNumberField.label.replace(' *', '')} debe ser un numero valido mayor a cero.`, 'error');
+    return false;
   }
 
   return true;

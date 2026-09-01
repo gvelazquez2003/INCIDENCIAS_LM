@@ -10,12 +10,15 @@ Frontend de registro de incidencias para Pan de Tata, basado visualmente en
 - `MALA MANIPULACION (COCINA)`
 - `DESPERDICIO PERECEDERO (VEGETALES)`
 - `MERMA DE PAN (COCINA)`
+- `AREA CAFE`
 
 Los modulos originales capturan `FECHA`, `PRODUCTO`, `RESPONSABLE` y `TURNO`.
 `ERROR EN SERVICIO`, `CONSUMO INTERNO` y `MALA MANIPULACION` tambien capturan
 `CANTIDAD`. `CONSUMO INTERNO` captura `OBSERVACIONES`.
 `DESPERDICIO PERECEDERO (VEGETALES)` tambien captura `CANTIDAD` y
 `OBSERVACIONES`.
+`AREA CAFE` captura el peso del producto seleccionado, el peso tostado y la
+merma del tueste. Los tres valores aceptan decimales y se guardan en kg.
 
 ## Archivos
 
@@ -35,6 +38,22 @@ El backend escribe en pestañas del spreadsheet con estos nombres:
 - `MALA MANIPULACION (COCINA)`
 - `DESPERDICIO PERECEDERO (VEG)`
 - `MERMA DE PAN (COCINA)`
+- `AREA CAFE`
+
+La hoja `AREA CAFE` se crea con estos encabezados:
+
+```text
+FECHA | PRODUCTO | PRODUCTO SELECCIONADO | TOSTADO | MERMA DEL TUESTE | RESPONSABLE | TURNO
+```
+
+Tambien se crea `PRODUCTOS AREA CAFE`, que funciona como catalogo editable:
+
+```text
+PRODUCTO | PRESENTACION KG
+```
+
+Inicialmente contiene `GRANO VERDE MERIDA`, `GRANO VERDE TACHIRA` y
+`GRANO VERDE TRUJILLO`, todos con una presentacion de `10 KG`.
 
 Cada hoja debe tener los encabezados en este orden:
 
@@ -83,6 +102,9 @@ renombradas, actualiza `CONFIG.sheetNames` en `Code.gs`.
 `Code.gs` crea y mantiene una pestana para revisar los registros:
 
 - `VISUALIZACION REGISTROS`: consolida todos los modulos en una sola tabla.
+
+La visualizacion incluye columnas separadas para `PRODUCTO SELECCIONADO (KG)`,
+`TOSTADO (KG)` y `MERMA DEL TUESTE (KG)`.
 
 La pestana `RESUMEN REGISTROS` ya no se usa. Si existe, se elimina al refrescar
 la visualizacion o al guardar un nuevo registro.

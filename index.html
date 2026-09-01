@@ -48,6 +48,10 @@
             <span class="module-btn__area">Cocina</span>
             <span>Merma de Pan</span>
           </button>
+          <button class="module-btn" data-module="area_cafe" type="button">
+            <span class="module-btn__area">Cafe</span>
+            <span>Area Cafe</span>
+          </button>
         </div>
 
         <section id="entry-panel" class="entry-panel hidden">
@@ -63,26 +67,26 @@
 
           <form id="incident-form" class="incident-form" novalidate>
             <div class="form-grid">
-              <label>
+              <label class="field-fecha">
                 <span>Fecha *</span>
                 <input id="fecha" name="fecha" type="date" required />
               </label>
 
-              <label>
+              <label class="field-responsable">
                 <span>Responsable *</span>
                 <select id="responsable" name="responsable" required>
                   <option value="">Seleccione un responsable...</option>
                 </select>
               </label>
 
-              <label>
+              <label class="field-turno">
                 <span>Turno *</span>
                 <select id="turno" name="turno" required>
                   <option value="">Seleccione un turno...</option>
                 </select>
               </label>
 
-              <label class="product-field">
+              <label class="product-field field-producto">
                 <span>Producto *</span>
                 <input id="producto" name="producto" type="text" list="product-list" placeholder="Busca el producto" autocomplete="off" required />
                 <datalist id="product-list"></datalist>

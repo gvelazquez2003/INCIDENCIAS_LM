@@ -9,6 +9,8 @@ spreadsheetId: '1Xdjhke-PW-XYDZho3I9AedgfYJmexBi1u6h2UWypIko',
 ```
 
 Los productos y precios se leen desde la hoja `PRECIOS PRODUCTOS`.
+Los productos del modulo `AREA CAFE` se leen desde `PRODUCTOS AREA CAFE`, que
+se crea automaticamente con los tres granos y su presentacion de `10 KG`.
 
 ## Prueba de envio
 
@@ -21,6 +23,16 @@ Los productos y precios se leen desde la hoja `PRECIOS PRODUCTOS`.
 Cada cambio de `Code.gs` requiere crear una nueva version del despliegue web en
 Apps Script. Reemplaza `Code.gs` y actualiza el despliegue antes de probar
 nuevamente.
+
+Despues de desplegar esta version, abre una vez la URL `/exec` con
+`?action=setupSheets`. Esto crea `AREA CAFE`, `PRODUCTOS AREA CAFE` y actualiza
+los encabezados de `VISUALIZACION REGISTROS`.
+
+La pestana `AREA CAFE` usa estos encabezados:
+
+```text
+FECHA | PRODUCTO | PRODUCTO SELECCIONADO | TOSTADO | MERMA DEL TUESTE | RESPONSABLE | TURNO
+```
 
 La pestana `CONSUMO INTERNO` debe existir con estos encabezados:
 

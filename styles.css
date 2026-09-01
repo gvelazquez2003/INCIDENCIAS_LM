@@ -255,6 +255,48 @@ textarea:focus {
   grid-column: 1 / -1;
 }
 
+.incident-form--cafe {
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+}
+
+.incident-form--cafe .form-grid,
+.incident-form--cafe .extra-fields {
+  display: contents;
+}
+
+.incident-form--cafe .field-fecha {
+  order: 1;
+}
+
+.incident-form--cafe .field-producto {
+  order: 2;
+}
+
+.incident-form--cafe .extra-field--productoSeleccionado {
+  order: 3;
+}
+
+.incident-form--cafe .extra-field--tostado {
+  order: 4;
+}
+
+.incident-form--cafe .extra-field--mermaTueste {
+  order: 5;
+}
+
+.incident-form--cafe .field-responsable {
+  order: 6;
+}
+
+.incident-form--cafe .field-turno {
+  order: 7;
+}
+
+.incident-form--cafe .form-actions {
+  grid-column: 1 / -1;
+  order: 8;
+}
+
 textarea {
   min-height: 92px;
   resize: vertical;
@@ -403,7 +445,8 @@ textarea {
 
   .module-buttons,
   .form-grid,
-  .extra-fields {
+  .extra-fields,
+  .incident-form--cafe {
     grid-template-columns: 1fr;
   }
 }
