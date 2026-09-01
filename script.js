@@ -488,6 +488,13 @@ function renderSelect(select, values, placeholder) {
 }
 
 function setupForm() {
+  elements.form.addEventListener('wheel', (event) => {
+    const target = event.target;
+    if (target && target.matches('input[type="number"]') && document.activeElement === target) {
+      target.blur();
+    }
+  }, { passive: true });
+
   elements.form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const module = getActiveModule();
