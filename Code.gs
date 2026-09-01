@@ -1,4 +1,4 @@
-const SCRIPT_VERSION = '2026-09-01-lm-area-cafe';
+const SCRIPT_VERSION = '2026-09-01-lm-error-produccion';
 const VISUALIZATION_REGISTROS_SHEET = 'VISUALIZACION REGISTROS';
 const OBSOLETE_RESUMEN_REGISTROS_SHEET = 'RESUMEN REGISTROS';
 
@@ -278,6 +278,7 @@ const CATALOGS = {
     'Producto equivocado, segun peticion del cliente',
     'Pedido mal entregado, equivocacion de mesas o clientes',
     'Cambios mal anotados',
+    'Error en producción',
     'Se cayo al suelo',
     'Cliente no satisfecho',
   ],

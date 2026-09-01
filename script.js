@@ -233,7 +233,7 @@ const FALLBACK_CATALOGS = {
     'GRANO VERDE TACHIRA',
     'GRANO VERDE TRUJILLO',
   ],
-  incidenciasServicio: ['Comanda repetida, sin aviso', 'Producto equivocado, segun peticion del cliente', 'Pedido mal entregado, equivocacion de mesas o clientes', 'Cambios mal anotados', 'Se cayo al suelo', 'Cliente no satisfecho'],
+  incidenciasServicio: ['Comanda repetida, sin aviso', 'Producto equivocado, segun peticion del cliente', 'Pedido mal entregado, equivocacion de mesas o clientes', 'Cambios mal anotados', 'Error en producción', 'Se cayo al suelo', 'Cliente no satisfecho'],
   incidenciasManipulacion: ['Pasada de coccion', 'Error en cambios', 'Producto demas / duplicado', 'Mala Manipulacion del pan', 'Se cayo al suelo', 'Proteina cruda', 'Cliente no satisfecho', 'Producto frio o mal emplatado'],
   productosMermaPan: [
     'PTEM0107 BAGEL EVERYTHING 105 GR 4 UND',
