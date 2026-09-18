@@ -237,7 +237,7 @@ const CATALOGS = {
     },
   ],
   responsablesBarra: [
-    'KEIDER MORA',
+    'EMILI VILORIA',
     'LEANDRO SEPRUM',
     'ANGEL VELASQUEZ',
     'KAROL MIJARES',
@@ -260,7 +260,7 @@ const CATALOGS = {
     'DAVID ESCALONA',
     'VIVIANA FARIÑA',
     'JHEISSON INNAMURATI',
-    'KEIDER MORA',
+    'EMILI VILORIA',
     'LEANDRO SEPRUM',
     'ANGEL VELASQUEZ',
     'KAROL MIJARES',

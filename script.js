@@ -197,7 +197,7 @@ const FALLBACK_CATALOGS = {
     },
   ],
   responsablesBarra: [
-    'KEIDER MORA',
+    'EMILI VILORIA',
     'LEANDRO SEPRUM',
     'ANGEL VELASQUEZ',
     'KAROL MIJARES',
@@ -220,7 +220,7 @@ const FALLBACK_CATALOGS = {
     'DAVID ESCALONA',
     'VIVIANA FARIÑA',
     'JHEISSON INNAMURATI',
-    'KEIDER MORA',
+    'EMILI VILORIA',
     'LEANDRO SEPRUM',
     'ANGEL VELASQUEZ',
     'KAROL MIJARES',
